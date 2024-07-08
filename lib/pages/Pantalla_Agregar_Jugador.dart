@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_champions/services/firestore_service.dart';
 import 'package:intl/intl.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
@@ -17,6 +18,7 @@ class _Pantalla_Agregar_JugadorState extends State<Pantalla_Agregar_Jugador> {
   final formkey = GlobalKey<FormState>();
   DateTime fecha_de_nacimiento = DateTime.now();
   final formatofecha = DateFormat('dd-MM-yyyy');
+  String Equipos = '';
    
   @override
   Widget build(BuildContext context) {
@@ -81,6 +83,33 @@ class _Pantalla_Agregar_JugadorState extends State<Pantalla_Agregar_Jugador> {
                 return null;
               },
             ),
+            //Equipo
+            FutureBuilder(
+              future: FirestoreService().Equipo(),
+              builder: (context, AsyncSnapshot snapshot) {
+                if (!snapshot.hasData || snapshot.connectionState == ConnectionState.waiting) {
+                  return Text('Cargando Equipos....');
+                } else {
+                  var Equipo = snapshot.data!.docs;
+                  return DropdownButtonFormField<String>(
+                    value:Equipos == '' ? Equipo[0]['Nombre'] : Equipos,
+                    decoration: InputDecoration(labelText: 'Equipo'),
+                    items: Equipo.map<DropdownMenuItem<String>>((Equipos) {
+                      return DropdownMenuItem<String>(
+                        child: Text(Equipos['Nombre']),
+                        value: Equipos['Nombre'],
+                      );
+                    }).toList(),
+                    onChanged: (equipoSeleccionado) {
+                      setState(() {
+                        this.Equipos =equipoSeleccionado!;
+                      });
+                    },
+                  );
+                }
+              },
+            ),
+            //FECHA DE NACIMIENTO
             Container(
               margin: EdgeInsets.only(top: 10),
               child: Row(
@@ -116,6 +145,13 @@ class _Pantalla_Agregar_JugadorState extends State<Pantalla_Agregar_Jugador> {
                 child: Text('Agregar Jugador', style: TextStyle(color: Colors.white)),
                 onPressed: () {
                   if(formkey.currentState!.validate()) {
+                    FirestoreService().jugadorAgregar(
+                      nombreCtrl.text.trim(),
+                      apellidoCtrl.text.trim(),
+                      int.parse(edadCtrl.text.trim()),
+                      this.Equipos,
+                      this.fecha_de_nacimiento,
+                      );
                     Navigator.pop(context);
                   }
                 },
