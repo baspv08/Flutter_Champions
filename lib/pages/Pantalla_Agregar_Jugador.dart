@@ -25,6 +25,7 @@ class _Pantalla_Agregar_JugadorState extends State<Pantalla_Agregar_Jugador> {
         title: Text('Agregar Jugadores', style: TextStyle(color: Colors.white)),
       ),
       body: Form(
+        key: formkey,
         child: Padding(
           padding: EdgeInsets.all(10),
           child: ListView(
@@ -94,7 +95,8 @@ class _Pantalla_Agregar_JugadorState extends State<Pantalla_Agregar_Jugador> {
                         context: context,
                         initialDate:  DateTime.now(),
                         firstDate: DateTime(1000),
-                        lastDate: DateTime.now()
+                        lastDate: DateTime.now(),
+                        locale: Locale('es', 'ES'),
                       ).then((fecha){
                         setState(() {
                           fecha_de_nacimiento = fecha ?? fecha_de_nacimiento;
@@ -114,8 +116,6 @@ class _Pantalla_Agregar_JugadorState extends State<Pantalla_Agregar_Jugador> {
                 child: Text('Agregar Jugador', style: TextStyle(color: Colors.white)),
                 onPressed: () {
                   if(formkey.currentState!.validate()) {
-
-
                     Navigator.pop(context);
                   }
                 },
